@@ -15,8 +15,14 @@ use crossterm::{
 };
 
 #[derive(Clone)]
+pub struct Message {
+    content: String,
+    is_user_message: bool,
+}
+
+#[derive(Clone)]
 pub struct App {
-    messages: Vec<String>,
+    messages: Vec<Message>,
     user_message: String,
     should_quit: bool,
 }
@@ -53,7 +59,11 @@ impl App {
                 ..
             } => {
                 if !self.user_message.is_empty() {
-                    self.messages.push(self.user_message.clone());
+                    let message = Message {
+                        content: self.user_message.clone(),
+                        is_user_message: true,
+                    };
+                    self.messages.push(message);
                 }
                 self.user_message = "".into();
             }
@@ -115,7 +125,21 @@ impl App {
 
     pub fn render_messsages(&self) -> Result<(), Error> {
         for (i, msg) in self.messages.iter().enumerate() {
-            execute!(stdout(), MoveTo(0, i as u16), Print(msg))?;
+            if msg.is_user_message {
+                execute!(
+                    stdout(),
+                    MoveTo(0, i as u16),
+                    Print("You: ".blue()),
+                    Print(msg.content.clone())
+                )?;
+            } else {
+                execute!(
+                    stdout(),
+                    MoveTo(0, i as u16),
+                    Print("Assistant: ".green()),
+                    Print(msg.content.clone())
+                )?;
+            };
         }
 
         stdout().flush()?;
