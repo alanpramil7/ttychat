@@ -1,0 +1,10 @@
+[package]
+name = "ttychat"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.98"
+crossterm = { version = "0.29.0", features = ["event-stream"] }
+futures = "0.3.31"
+smol = "2.0.2"
